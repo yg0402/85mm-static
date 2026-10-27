@@ -12,15 +12,44 @@
   <main>
     <section class="notice" aria-label="サイトリニューアルのお知らせ">
       <h1 class="notice-title">リニューアルちゅう</h1>
-      <!-- 静的表示です。必要に応じて datetime 属性と表示テキストを更新してください。 -->
-      <div class="date-and-time" aria-label="2026年10月27日 16時34分">
-        <time class="date" datetime="2026-10-27">2026/10/27</time>
-        <div class="clock-wrap"><time class="clock" datetime="16:34">16:34</time></div>
+      <div class="date-and-time" aria-label="日本時間">
+        <time class="date">----/--/--</time>
+        <div class="clock-wrap"><time class="clock">--:--</time></div>
       </div>
       <div class="social">
         <a href="https://x.com/suko_hakumai" target="_blank" rel="noopener noreferrer">X : @suko_hakumai</a>
       </div>
     </section>
   </main>
+  <script>
+    (() => {
+      const date = document.querySelector('.date');
+      const clock = document.querySelector('.clock');
+      const group = document.querySelector('.date-and-time');
+      const formatter = new Intl.DateTimeFormat('en-GB', {
+        timeZone: 'Asia/Tokyo',
+        year: 'numeric', month: '2-digit', day: '2-digit',
+        hour: '2-digit', minute: '2-digit', hourCycle: 'h23'
+      });
+
+      function updateClock() {
+        const parts = Object.fromEntries(
+          formatter.formatToParts(new Date()).map(({ type, value }) => [type, value])
+        );
+        const { year, month, day, hour, minute } = parts;
+        date.textContent = `${year}/${month}/${day}`;
+        date.dateTime = `${year}-${month}-${day}`;
+        clock.textContent = `${hour}:${minute}`;
+        clock.dateTime = `${year}-${month}-${day}T${hour}:${minute}:00+09:00`;
+        group.setAttribute('aria-label', `日本時間 ${year}年${month}月${day}日 ${hour}時${minute}分`);
+      }
+
+      updateClock();
+      setInterval(updateClock, 1000);
+      document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) updateClock();
+      });
+    })();
+  </script>
 </body>
 </html>
